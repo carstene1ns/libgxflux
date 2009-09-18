@@ -29,8 +29,8 @@ typedef enum {
 
 typedef struct {
 	gfx_colorop_t op;
-	const GXColor *c1;
-	const GXColor *c2;
+	GXColor c1;
+	GXColor c2;
 } _colorop_t;
 
 static struct {
@@ -394,7 +394,7 @@ bool gfx_frame_start(void) {
 	GX_InvalidateTexAll();
 	_gfx.tex_loaded = NULL;
 
-	gfx_set_colorop(COLOROP_NONE, NULL, NULL);
+	gfx_set_colorop(COLOROP_NONE, gfx_color_none, gfx_color_none);
 
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
 
@@ -412,25 +412,16 @@ void gfx_frame_end(void) {
 }
 
 // TEV formula for OP ADD and SUB: (a * (1.0 - c) + b * c) OP d
-void gfx_set_colorop(gfx_colorop_t colorop, const GXColor *c1,
-						const GXColor *c2) {
+void gfx_set_colorop(gfx_colorop_t op, const GXColor c1, const GXColor c2) {
 	bool skip = false;
 
-	if (_gfx.colorop.op == colorop) {
-		switch (colorop) {
-		case COLOROP_MODULATE_FG:
-			if (_gfx.colorop.c1 == c1)
-				return;
-
-			GX_SetTevKColor(GX_KCOLOR0, *c1);
-			break;
-
+	if (_gfx.colorop.op == op) {
+		switch (op) {
 		case COLOROP_MODULATE_FGBG:
-			if ((_gfx.colorop.c1 == c1) && (_gfx.colorop.c2 == c2))
-				return;
-
-			GX_SetTevKColor(GX_KCOLOR0, *c1);
-			GX_SetTevKColor(GX_KCOLOR1, *c2);
+			if (!gfx_color_cmp(_gfx.colorop.c1, c1))
+				GX_SetTevKColor(GX_KCOLOR0, c1);
+			if (!gfx_color_cmp(_gfx.colorop.c2, c2))
+				GX_SetTevKColor(GX_KCOLOR1, c2);
 			break;
 
 		default:
@@ -440,7 +431,7 @@ void gfx_set_colorop(gfx_colorop_t colorop, const GXColor *c1,
 		skip = true;
 	}
 
-	_gfx.colorop.op = colorop;
+	_gfx.colorop.op = op;
 	_gfx.colorop.c1 = c1;
 	_gfx.colorop.c2 = c2;
 
@@ -451,7 +442,7 @@ void gfx_set_colorop(gfx_colorop_t colorop, const GXColor *c1,
 	GX_SetNumTexGens(1);
 	GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 
-	switch (colorop) {
+	switch (op) {
 	case COLOROP_SIMPLEFADE:
 		GX_SetNumTevStages(1);
 		GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLORZERO);
@@ -466,53 +457,37 @@ void gfx_set_colorop(gfx_colorop_t colorop, const GXColor *c1,
 							GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 		break;
 
-	case COLOROP_MODULATE_FG:
-		GX_SetNumTevStages(1);
-		GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLORZERO);
-
-		GX_SetTevKColor(GX_KCOLOR0, *c1);
-		GX_SetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
-
-		GX_SetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_KONST,
-							GX_CC_TEXC, GX_CC_ZERO);
-		GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO,
-							GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-
-		GX_SetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO,
-							GX_CA_ZERO, GX_CA_TEXA);
-		GX_SetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO,
-							GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		break;
-
 	case COLOROP_MODULATE_FGBG:
 		GX_SetNumTevStages(2);
 		GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLORZERO);
 
-		GX_SetTevKColor(GX_KCOLOR0, *c1);
-		GX_SetTevKColor(GX_KCOLOR1, *c2);
+		GX_SetTevKColor(GX_KCOLOR0, c1);
+		GX_SetTevKColor(GX_KCOLOR1, c2);
 		GX_SetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
+		GX_SetTevKAlphaSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0_A);
 
-		GX_SetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_KONST,
-							GX_CC_TEXC, GX_CC_ZERO);
+		GX_SetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO,
+							GX_CC_ZERO, GX_CC_KONST);
 		GX_SetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO,
 							GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
 
 		GX_SetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO,
-							GX_CA_ZERO, GX_CA_TEXA);
+							GX_CA_ZERO, GX_CA_KONST);
 		GX_SetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO,
-							GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+							GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
 
 		GX_SetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLORZERO);
 
 		GX_SetTevKColorSel(GX_TEVSTAGE1, GX_TEV_KCSEL_K1);
+		GX_SetTevKAlphaSel(GX_TEVSTAGE1, GX_TEV_KCSEL_K1_A);
 
 		GX_SetTevColorIn(GX_TEVSTAGE1, GX_CC_KONST, GX_CC_C0,
 							GX_CC_TEXC, GX_CC_ZERO);
 		GX_SetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO,
 							GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
-		GX_SetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO,
-							GX_CA_ZERO, GX_CA_KONST);
+		GX_SetTevAlphaIn(GX_TEVSTAGE1, GX_CA_KONST, GX_CA_A0,
+							GX_CA_TEXA, GX_CA_ZERO);
 		GX_SetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO,
 							GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 

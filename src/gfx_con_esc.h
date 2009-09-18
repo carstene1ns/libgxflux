@@ -19,6 +19,8 @@
 #define CON_SAVEATTR			"\e7"
 #define CON_RESTOREATTR			"\e8"
 
+#define CON_COLRESET			CON_ESC "0m"
+
 #define C_BLACK					CON_ESC "30m"
 #define C_RED					CON_ESC "31m"
 #define C_GREEN					CON_ESC "32m"
@@ -69,8 +71,6 @@
 #define S_IMAGENTA(s)			C_IMAGENTA s C_WHITE
 #define S_ICYAN(s)				C_ICYAN s C_WHITE
 #define S_IWHITE(s)				C_IWHITE s C_WHITE
-
-#define CON_COLRESET			C_WHITE B_BLACK
 
 #endif
 

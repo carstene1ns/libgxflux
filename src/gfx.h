@@ -38,8 +38,7 @@ f32 gfx_set_ar(f32 ar);
 bool gfx_frame_start(void);
 void gfx_frame_end(void);
 
-void gfx_set_colorop(gfx_colorop_t colorop, const GXColor *c1,
-						const GXColor *c2);
+void gfx_set_colorop(gfx_colorop_t op, const GXColor c1, const GXColor c2);
 
 void gfx_draw_tex(gfx_tex_t *tex, gfx_screen_coords_t *coords);
 void gfx_draw_tile(gfx_tiles_t *tiles, gfx_screen_coords_t *coords,

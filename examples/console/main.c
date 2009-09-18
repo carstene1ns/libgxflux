@@ -76,18 +76,18 @@ int main(int argc, char *argv[]) {
 
 		if (b & 15) {
 			if (b & PAD_BUTTON_LEFT)
-				fg = (fg - 1) % 8;
+				fg = (fg + 8 - 1) % 8;
 			if (b & PAD_BUTTON_RIGHT)
 				fg = (fg + 1) % 8;
 			if (b & PAD_BUTTON_UP)
-				bg = (bg - 1) % 8;
+				bg = (bg + 8 - 1) % 8;
 			if (b & PAD_BUTTON_DOWN)
 				bg = (bg + 1) % 8;
 
-			printf(CON_ESC "%um" CON_ESC "%umnew color selected: %u %u\n", 30 + fg, 40 + bg, fg, bg);
+			printf(CON_ESC "%u;1m" CON_ESC "%umnew color selected: %u %u\n", 30 + fg, 40 + bg, fg, bg);
 		}
 
-		printf(CON_SAVEATTR CON_POS(0, 20) S_WHITE("frame: %u") CON_RESTOREATTR, frame);
+		printf(CON_SAVEATTR CON_POS(0, 20) CON_COLRESET "frame: %u" CON_RESTOREATTR, frame);
 
 		retries = 0;
 		while (!gfx_frame_start()) {
@@ -100,9 +100,6 @@ int main(int argc, char *argv[]) {
 
 			usleep(50);
 		}
-
-		if (pf)
-			gfx_set_colorop(COLOROP_SIMPLEFADE, NULL, NULL);
 
 		gfx_draw_tex(&tex, &coords_bg);
 		gfx_con_draw();

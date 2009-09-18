@@ -80,7 +80,6 @@ typedef struct {
 typedef enum {
 	COLOROP_NONE = 0,
 	COLOROP_SIMPLEFADE,
-	COLOROP_MODULATE_FG,
 	COLOROP_MODULATE_FGBG
 } gfx_colorop_t;
 

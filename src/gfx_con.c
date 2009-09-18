@@ -104,6 +104,7 @@ static struct {
 	u16 *top;
 	u16 *pos;
 	u8 fg, bg;
+	u8 alpha_fg, alpha_bg;
 
 	u8 saved_col, saved_row;
 	u8 saved_fg, saved_bg;
@@ -114,14 +115,22 @@ static void _con_reset(void) {
 	_con.top = _con.buf;
 	_con.col = 0;
 	_con.row = 0;
+	_con.fg = 7;
+	_con.bg = 0;
+	_con.alpha_fg = 0xff;
+	_con.alpha_bg = 0xff;
 	_con.saved_col = 0;
 	_con.saved_row = 0;
 	_con.saved_fg = 7;
 	_con.saved_bg = 0;
+	memset(_con.buf, 0, _con.cols * _con.rows * sizeof(u16));
 }
 
 static void _con_clear(void) {
-	_con_reset();
+	_con.pos = _con.buf;
+	_con.top = _con.buf;
+	_con.col = 0;
+	_con.row = 0;
 	memset(_con.buf, 0, _con.cols * _con.rows * sizeof(u16));
 }
 
@@ -164,9 +173,7 @@ static size_t _con_esc(const char *ptr, size_t len) {
 
 	switch (c) {
 	case 'c': // Reset Device
-		_con.fg = 7;
-		_con.bg = 0;
-		_con_clear();
+		_con_reset();
 		break;
 
 	case '7': // Save Cursor & Attrs
@@ -475,9 +482,7 @@ bool gfx_con_init(gfx_screen_coords_t *coords) {
 		return false;
 
 	_con.end = _con.buf + _con.cols * _con.rows - 1;
-	_con.fg = 7;
-	_con.bg = 0;
-	_con_clear();
+	_con_reset();
 
 	return true;
 }
@@ -509,6 +514,7 @@ void gfx_con_draw(void) {
 	u16 x, y;
 	u16 val;
 	u8 c, fg, bg;
+	GXColor c_fg, c_bg;
 
 	p = _con.top;
 
@@ -528,13 +534,16 @@ void gfx_con_draw(void) {
 			bg = (val >> 8) & 0xf;
 
 			if ((c >= TEX_CHAR_FIRST) && (c <= TEX_CHAR_LAST)) {
-				if (!bg)
-					gfx_set_colorop(COLOROP_MODULATE_FG,
-									&_con_colors[fg], NULL);
+				c_fg = _con_colors[fg];
+				c_bg = _con_colors[bg];
+				c_fg.a = _con.alpha_fg;
+
+				if (bg)
+					c_bg.a = _con.alpha_bg;
 				else
-					gfx_set_colorop(COLOROP_MODULATE_FGBG,
-									&_con_colors[fg],
-									&_con_colors[bg]);
+					c_bg.a = 0;
+
+				gfx_set_colorop(COLOROP_MODULATE_FGBG, c_fg, c_bg);
 
 				c -= TEX_CHAR_FIRST;
 				gfx_draw_tile_by_index(&_con.tiles, &coords, c);
@@ -551,7 +560,7 @@ void gfx_con_draw(void) {
 		coords.y += TEX_CHAR_HEIGHT;
 	}
 
-	gfx_set_colorop(COLOROP_NONE, NULL, NULL);
+	gfx_set_colorop(COLOROP_NONE, gfx_color_none, gfx_color_none);
 	gfx_enable_viewport(vp);
 }
 
