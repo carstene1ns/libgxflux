@@ -81,7 +81,7 @@ static const GXColor _con_colors[] = {
 	{ 0x9c, 0x38, 0x85, 0xff },
 	{ 0x1d, 0xbd, 0xb8, 0xff },
 	{ 0xfe, 0xfe, 0xfe, 0xff },
-	{ 0x6a, 0x6a, 0x6a, 0xff },
+	{ 0x0a, 0x0a, 0x0a, 0xff },
 	{ 0xe8, 0x3a, 0x3d, 0xff },
 	{ 0x35, 0xe9, 0x56, 0xff },
 	{ 0xff, 0xff, 0x2f, 0xff },
@@ -223,10 +223,24 @@ static size_t _con_esc(const char *ptr, size_t len) {
 		case 'f': // Force Cursor Position
 			_con.row = 0;
 			_con.col = 0;
-			if (count > 0)
-				_con.row = parms[0];
-			if (count > 1)
-				_con.col = parms[1];
+			if (count > 0) {
+				tmp = parms[0] - 1;
+				if (tmp < 0)
+					tmp = 0;
+				if (tmp > _con.rows - 1)
+					tmp = _con.rows - 1;
+				_con.row = tmp;
+			}
+
+			if (count > 1) {
+				tmp = parms[1] - 1;
+				if (tmp < 0)
+					tmp = 0;
+				if (tmp > _con.cols - 1)
+					tmp = _con.cols - 1;
+				_con.col = tmp;
+			}
+
 			_con_setpos();
 			break;
 
@@ -505,6 +519,19 @@ void gfx_con_deinit(void) {
 
 	gfx_tiles_deinit(&_con.tiles);
 	gfx_tex_deinit(&_con.tex);
+}
+
+u8 gfx_con_get_columns(void) {
+	return _con.cols;
+}
+
+u8 gfx_con_get_rows(void) {
+	return _con.rows;
+}
+
+void gfx_con_set_alpha(u8 foreground, u8 background) {
+	_con.alpha_fg = foreground;
+	_con.alpha_bg = background;
 }
 
 void gfx_con_draw(void) {

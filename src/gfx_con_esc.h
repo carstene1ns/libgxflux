@@ -8,14 +8,8 @@
 #define CON_CLEAR				CON_ESC "2J"
 #define CON_HOME				CON_ESC "H"
 
-#define CON_UP(rows)			CON_ESC #rows "A"
-#define CON_DOWN(rows)			CON_ESC #rows "B"
-#define CON_FORWARD(columns)	CON_ESC #columns "C"
-#define CON_BACKWARD(columns)	CON_ESC #columns "D"
-
-#define CON_POS(row, column)	CON_ESC #row ";" #column "H"
-#define CON_SAVE				CON_ESC "s"
-#define CON_RESTORE				CON_ESC "u"
+#define CON_SAVEPOS				CON_ESC "s"
+#define CON_RESTOREPOS			CON_ESC "u"
 #define CON_SAVEATTR			"\e7"
 #define CON_RESTOREATTR			"\e8"
 
@@ -55,22 +49,22 @@
 #define B_ICYAN					CON_ESC "46;1m"
 #define B_IWHITE				CON_ESC "47;1m"
 
-#define S_BLACK(s)				C_BLACK s C_WHITE
-#define S_RED(s)				C_RED s C_WHITE
-#define S_GREEN(s)				C_GREEN s C_WHITE
-#define S_YELLOW(s)				C_YELLOW s C_WHITE
-#define S_BLUE(s)				C_BLUE s C_WHITE
-#define S_MAGENTA(s)			C_MAGENTA s C_WHITE
-#define S_CYAN(s)				C_CYAN s C_WHITE
-#define S_WHITE(s)				C_WHITE s
-#define S_IBLACK(s)				C_IBLACK s C_WHITE
-#define S_IRED(s)				C_IRED s C_WHITE
-#define S_IGREEN(s)				C_IGREEN s C_WHITE
-#define S_IYELLOW(s)			C_IYELLOW s C_WHITE
-#define S_IBLUE(s)				C_IBLUE s C_WHITE
-#define S_IMAGENTA(s)			C_IMAGENTA s C_WHITE
-#define S_ICYAN(s)				C_ICYAN s C_WHITE
-#define S_IWHITE(s)				C_IWHITE s C_WHITE
+#define S_BLACK(s)				C_BLACK s CON_COLRESET
+#define S_RED(s)				C_RED s CON_COLRESET
+#define S_GREEN(s)				C_GREEN s CON_COLRESET
+#define S_YELLOW(s)				C_YELLOW s CON_COLRESET
+#define S_BLUE(s)				C_BLUE s CON_COLRESET
+#define S_MAGENTA(s)			C_MAGENTA s CON_COLRESET
+#define S_CYAN(s)				C_CYAN s CON_COLRESET
+#define S_WHITE(s)				C_WHITE s CON_COLRESET
+#define S_IBLACK(s)				C_IBLACK s CON_COLRESET
+#define S_IRED(s)				C_IRED s CON_COLRESET
+#define S_IGREEN(s)				C_IGREEN s CON_COLRESET
+#define S_IYELLOW(s)			C_IYELLOW s CON_COLRESET
+#define S_IBLUE(s)				C_IBLUE s CON_COLRESET
+#define S_IMAGENTA(s)			C_IMAGENTA s CON_COLRESET
+#define S_ICYAN(s)				C_ICYAN s CON_COLRESET
+#define S_IWHITE(s)				C_IWHITE s CON_COLRESET
 
 #endif
 

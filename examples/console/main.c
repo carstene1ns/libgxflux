@@ -53,8 +53,12 @@ int main(int argc, char *argv[]) {
 			printf("frame: %u\n", frame);
 
 		b = 0;
-		if (PAD_ScanPads() & 1)
+		if (PAD_ScanPads() & 1) {
 			b = PAD_ButtonsDown(0);
+		
+			gfx_con_set_alpha(0xff - PAD_TriggerR(0),
+								0xff - PAD_TriggerL(0));
+		}
 
 		if (b & PAD_BUTTON_A)
 			quit = true;
@@ -66,28 +70,39 @@ int main(int argc, char *argv[]) {
 			printf(S_RED("Hello") " " S_BLUE("world") "!\n");
 
 		if (b & PAD_BUTTON_Y)
-			printf(CON_CLEAR);
+			gfx_con_clear();
 
 		if (b & PAD_TRIGGER_Z) {
-			printf(CON_RESET);
+			gfx_con_reset();
 			fg = 7;
 			bg = 0;
 		}
 
 		if (b & 15) {
-			if (b & PAD_BUTTON_LEFT)
+			if (b & PAD_BUTTON_LEFT) {
 				fg = (fg + 8 - 1) % 8;
-			if (b & PAD_BUTTON_RIGHT)
+				gfx_con_set_foreground_color(fg, true);
+			}
+			if (b & PAD_BUTTON_RIGHT) {
 				fg = (fg + 1) % 8;
-			if (b & PAD_BUTTON_UP)
+				gfx_con_set_foreground_color(fg, true);
+			}
+			if (b & PAD_BUTTON_UP) {
 				bg = (bg + 8 - 1) % 8;
-			if (b & PAD_BUTTON_DOWN)
+				gfx_con_set_background_color(bg, false);
+			}
+			if (b & PAD_BUTTON_DOWN) {
 				bg = (bg + 1) % 8;
+				gfx_con_set_background_color(bg, false);
+			}
 
-			printf(CON_ESC "%u;1m" CON_ESC "%umnew color selected: %u %u\n", 30 + fg, 40 + bg, fg, bg);
+			printf("new color selected: %u %u\n", fg, bg);
 		}
 
-		printf(CON_SAVEATTR CON_POS(0, 20) CON_COLRESET "frame: %u" CON_RESTOREATTR, frame);
+		gfx_con_save_attr();
+		gfx_con_set_pos(1, gfx_con_get_columns() - 14);
+		printf(CON_COLRESET "frame: %u", frame);
+		gfx_con_restore_attr();
 
 		retries = 0;
 		while (!gfx_frame_start()) {
