@@ -411,6 +411,11 @@ void gfx_frame_end(void) {
 	GX_SetDrawDone();
 }
 
+void gfx_frame_abort(void) {
+	GX_AbortFrame();
+	_gfx.busy = BUSY_READY;
+}
+
 // TEV formula for OP ADD and SUB: (a * (1.0 - c) + b * c) OP d
 void gfx_set_colorop(gfx_colorop_t op, const GXColor c1, const GXColor c2) {
 	bool skip = false;

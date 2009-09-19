@@ -37,6 +37,7 @@ f32 gfx_set_ar(f32 ar);
 
 bool gfx_frame_start(void);
 void gfx_frame_end(void);
+void gfx_frame_abort(void);
 
 void gfx_set_colorop(gfx_colorop_t op, const GXColor c1, const GXColor c2);
 

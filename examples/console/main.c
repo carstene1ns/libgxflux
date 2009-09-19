@@ -61,8 +61,7 @@ int main(int argc, char *argv[]) {
 		if (PAD_ScanPads() & 1) {
 			b = PAD_ButtonsDown(0);
 		
-			gfx_con_set_alpha(0xff - PAD_TriggerR(0),
-								0xff - PAD_TriggerL(0));
+			gfx_con_set_alpha(0xff - PAD_TriggerR(0), 0xff - PAD_TriggerL(0));
 		}
 
 		if (b & PAD_BUTTON_A)
@@ -119,7 +118,7 @@ int main(int argc, char *argv[]) {
 			retries++;
 			if (retries > 1000) {
 				printf("gx hates you\n");
-				GX_AbortFrame();
+				gfx_frame_abort();
 				return -1;
 			}
 
