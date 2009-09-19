@@ -1,11 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 
 #include <ogcsys.h>
+#include <ogc/lwp_watchdog.h>
 
 #include <gfx/gfx.h>
 #include <gfx/gfx_con.h>
+
+#define IRAND(max) ((int) ((float )(max) * (rand() / (RAND_MAX + 1.0))))
 
 static bool quit = false;
 
@@ -42,16 +46,17 @@ int main(int argc, char *argv[]) {
 	gfx_screen_coords_t coords_bg;
 	gfx_coords(&coords_bg, &tex, GFX_COORD_FULLSCREEN);
 
-	u32 frame = 0;
+	srand(gettime());
+
+	u64 frame = 0;
 	u16 b;
 	bool pf = false;
 	u32 retries;
 	u8 fg = 7, bg = 0;
+	u32 i;
+	char buf[32];
 
 	while (!quit) {
-		if (pf)
-			printf("frame: %u\n", frame);
-
 		b = 0;
 		if (PAD_ScanPads() & 1) {
 			b = PAD_ButtonsDown(0);
@@ -69,8 +74,12 @@ int main(int argc, char *argv[]) {
 		if (b & PAD_BUTTON_X)
 			printf(S_RED("Hello") " " S_BLUE("world") "!\n");
 
-		if (b & PAD_BUTTON_Y)
-			gfx_con_clear();
+		if (pf) {
+			for (i = 0; i < gfx_con_get_columns() * gfx_con_get_rows(); ++i) {
+				printf(CON_ESC "%u;1m" CON_ESC "%um%c", 30 + IRAND(8),
+						40 + IRAND(8), 0x20 + IRAND(16 * 9));
+			}
+		}
 
 		if (b & PAD_TRIGGER_Z) {
 			gfx_con_reset();
@@ -99,9 +108,10 @@ int main(int argc, char *argv[]) {
 			printf("new color selected: %u %u\n", fg, bg);
 		}
 
+		sprintf(buf, "frame: %llu", frame);
 		gfx_con_save_attr();
-		gfx_con_set_pos(1, gfx_con_get_columns() - 14);
-		printf(CON_COLRESET "frame: %u", frame);
+		gfx_con_set_pos(1, gfx_con_get_columns() - strlen(buf) + 1);
+		printf(CON_COLRESET "%s", buf);
 		gfx_con_restore_attr();
 
 		retries = 0;
