@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#define FIFO_SIZE (1024 * 1024)
+#define FIFO_SIZE (512 * 1024)
 #define ORIGIN_Z (-500.0)
 
 typedef enum {
