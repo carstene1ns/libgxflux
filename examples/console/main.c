@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 	SYS_SetResetCallback(stmcb);
 	SYS_SetPowerCallback(stmcb);
 
-	gfx_video_init(GFX_STANDARD_AUTO, GFX_MODE_DEFAULT);
+	gfx_video_init(NULL);
 	gfx_init();
 	gfx_con_init(NULL);
 

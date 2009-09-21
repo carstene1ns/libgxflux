@@ -34,7 +34,7 @@ typedef struct {
 } _colorop_t;
 
 static struct {
-	GXRModeObj *vm;
+	GXRModeObj vm;
 	bool doublestrike;
 
 	u32 *fb[2];
@@ -105,8 +105,8 @@ static void _update_viewport(void) {
 
 		x1 = _gfx.underscan_x * 2;
 		y1 = usy;
-		x2 = _gfx.vm->fbWidth - _gfx.underscan_x * 4;
-		y2 = _gfx.vm->efbHeight - usy * 2;
+		x2 = _gfx.vm.fbWidth - _gfx.underscan_x * 4;
+		y2 = _gfx.vm.efbHeight - usy * 2;
 
 		if (_gfx.pillarboxing)
 			ar = 16.0 / 9.0;
@@ -115,14 +115,14 @@ static void _update_viewport(void) {
 
 		if (fabs(ar - _gfx.ar) > 0.05) {
 			if (ar > _gfx.ar) {
-				correction = _gfx.vm->viWidth - 
-							(u16) round((f32) _gfx.vm->viWidth * _gfx.ar / ar);
+				correction = _gfx.vm.viWidth - 
+							(u16) round((f32) _gfx.vm.viWidth * _gfx.ar / ar);
 
 				x1 += correction / 2;
 				x2 -= correction;
 			} else {
-				correction = _gfx.vm->efbHeight - 
-							(u16) round((f32) _gfx.vm->efbHeight * ar / _gfx.ar);
+				correction = _gfx.vm.efbHeight - 
+							(u16) round((f32) _gfx.vm.efbHeight * ar / _gfx.ar);
 
 				if (_gfx.doublestrike)
 					correction /= 2;
@@ -134,8 +134,8 @@ static void _update_viewport(void) {
 	} else {
 		x1 = 0;
 		y1 = 0;
-		x2 = _gfx.vm->fbWidth;
-		y2 = _gfx.vm->efbHeight;
+		x2 = _gfx.vm.fbWidth;
+		y2 = _gfx.vm.efbHeight;
 	}
 
 	GX_SetViewport(x1, y1, x2, y2, 0, 1);
@@ -183,7 +183,15 @@ gfx_video_standard_t gfx_video_get_standard(void) {
 	return standard;
 }
 
-void gfx_video_init(gfx_video_standard_t standard, gfx_video_mode_t mode) {
+void gfx_video_get_modeobj(GXRModeObj *obj, gfx_video_standard_t standard,
+							gfx_video_mode_t mode) {
+	if (standard == GFX_STANDARD_AUTO)
+		standard = gfx_video_get_standard();
+
+	memcpy(obj, mode_table[standard][mode], sizeof(GXRModeObj));
+}
+
+void gfx_video_init(GXRModeObj *obj) {
 	static bool inited = false;
 	u32 fb_size;
 	u8 i;
@@ -193,28 +201,29 @@ void gfx_video_init(gfx_video_standard_t standard, gfx_video_mode_t mode) {
 
 		_gfx.viewport_enabled = true;
 		_gfx.ar = 4.0 / 3.0;
-
-		inited = true;
 	}
 
-	if (standard == GFX_STANDARD_AUTO)
-		standard = gfx_video_get_standard();
+	if (obj) {
+		memcpy(&_gfx.vm, obj, sizeof(GXRModeObj));
+	} else {
+		gfx_video_get_modeobj(&_gfx.vm, GFX_STANDARD_AUTO, GFX_MODE_DEFAULT);
+		_gfx.vm.viWidth = 672;
+		_gfx.vm.viXOrigin = (VI_MAX_WIDTH_NTSC - _gfx.vm.viWidth) / 2;
+	}
 
-	_gfx.vm = mode_table[standard][mode];
-	_gfx.doublestrike = _gfx.vm->viHeight == 2 * _gfx.vm->xfbHeight;
-
-	_gfx.vm->viWidth = 672;
-	_gfx.vm->viXOrigin = (VI_MAX_WIDTH_NTSC - _gfx.vm->viWidth) / 2;
+	_gfx.doublestrike = _gfx.vm.viHeight == 2 * _gfx.vm.xfbHeight;
 
 	VIDEO_SetNextFramebuffer(NULL);
 
-	if (_gfx.vm)
+	if (inited)
 		VIDEO_WaitVSync();
 
-	VIDEO_Configure(_gfx.vm);
+	inited = true;
+
+	VIDEO_Configure(&_gfx.vm);
 	VIDEO_Flush();
 
-	fb_size = VIDEO_GetFrameBufferSize(_gfx.vm);
+	fb_size = VIDEO_GetFrameBufferSize(&_gfx.vm);
 
 	if (_gfx.fb_size != fb_size) {
 		if (_gfx.fb[0])
@@ -222,14 +231,14 @@ void gfx_video_init(gfx_video_standard_t standard, gfx_video_mode_t mode) {
 		if (_gfx.fb[1])
 			free(MEM_K1_TO_K0(_gfx.fb[1]));
 
-		_gfx.fb[0] = (u32 *) MEM_K0_TO_K1(SYS_AllocateFramebuffer(_gfx.vm));
-		_gfx.fb[1] = (u32 *) MEM_K0_TO_K1(SYS_AllocateFramebuffer(_gfx.vm));
+		_gfx.fb[0] = (u32 *) MEM_K0_TO_K1(SYS_AllocateFramebuffer(&_gfx.vm));
+		_gfx.fb[1] = (u32 *) MEM_K0_TO_K1(SYS_AllocateFramebuffer(&_gfx.vm));
 
 		_gfx.fb_size = fb_size;
 	}
 
-	VIDEO_ClearFrameBuffer(_gfx.vm, _gfx.fb[0], COLOR_BLACK);
-	VIDEO_ClearFrameBuffer(_gfx.vm, _gfx.fb[1], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer(&_gfx.vm, _gfx.fb[0], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer(&_gfx.vm, _gfx.fb[1], COLOR_BLACK);
 
 	VIDEO_SetNextFramebuffer(_gfx.fb[_gfx.fb_active]);
 	VIDEO_SetBlack(FALSE);
@@ -262,11 +271,11 @@ void gfx_video_deinit(void) {
 }
 
 u16 gfx_video_get_width(void) {
-	return _gfx.vm->fbWidth;
+	return _gfx.vm.fbWidth;
 }
 
 u16 gfx_video_get_height(void) {
-	return _gfx.vm->efbHeight;
+	return _gfx.vm.efbHeight;
 }
 
 void gfx_init(void) {
@@ -284,19 +293,19 @@ void gfx_init(void) {
 
 	GX_SetCopyClear(gfx_color_black, 0x00ffffff);
 
-	yscale = GX_GetYScaleFactor(_gfx.vm->efbHeight, _gfx.vm->xfbHeight);
+	yscale = GX_GetYScaleFactor(_gfx.vm.efbHeight, _gfx.vm.xfbHeight);
 	xfbHeight = GX_SetDispCopyYScale(yscale);
-	GX_SetDispCopySrc(0, 0, _gfx.vm->fbWidth, _gfx.vm->efbHeight);
-	GX_SetDispCopyDst(_gfx.vm->fbWidth, xfbHeight);
-	GX_SetCopyFilter(_gfx.vm->aa, _gfx.vm->sample_pattern, GX_TRUE,
-					_gfx.vm->vfilter);
+	GX_SetDispCopySrc(0, 0, _gfx.vm.fbWidth, _gfx.vm.efbHeight);
+	GX_SetDispCopyDst(_gfx.vm.fbWidth, xfbHeight);
+	GX_SetCopyFilter(_gfx.vm.aa, _gfx.vm.sample_pattern, GX_TRUE,
+					_gfx.vm.vfilter);
 
 	if (_gfx.doublestrike)
-		GX_SetFieldMode(_gfx.vm->field_rendering, GX_ENABLE);
+		GX_SetFieldMode(_gfx.vm.field_rendering, GX_ENABLE);
 	else
-		GX_SetFieldMode(_gfx.vm->field_rendering, GX_DISABLE);
+		GX_SetFieldMode(_gfx.vm.field_rendering, GX_DISABLE);
 
-	if (_gfx.vm->aa)
+	if (_gfx.vm.aa)
 		GX_SetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
 	else
 		GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
@@ -319,7 +328,7 @@ void gfx_init(void) {
 	memset(&_gfx.view, 0, sizeof(Mtx));
 	guLookAt(_gfx.view, &_camera.pos, &_camera.up, &_camera.view);
 
-	guOrtho(p, 0, _gfx.vm->efbHeight, 0, _gfx.vm->fbWidth, 100, 1000);
+	guOrtho(p, 0, _gfx.vm.efbHeight, 0, _gfx.vm.fbWidth, 100, 1000);
 	GX_LoadProjectionMtx (p, GX_ORTHOGRAPHIC);
 	_update_viewport();
 
@@ -495,7 +504,6 @@ void gfx_set_colorop(gfx_colorop_t op, const GXColor c1, const GXColor c2) {
 							GX_CA_TEXA, GX_CA_ZERO);
 		GX_SetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO,
 							GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-
 		break;
 
 	default:

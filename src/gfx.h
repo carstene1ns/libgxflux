@@ -20,8 +20,10 @@ extern "C" {
 #endif
 
 gfx_video_standard_t gfx_video_get_standard(void);
+void gfx_video_get_modeobj(GXRModeObj *obj, gfx_video_standard_t standard,
+							gfx_video_mode_t mode);
 
-void gfx_video_init(gfx_video_standard_t standard, gfx_video_mode_t mode);
+void gfx_video_init(GXRModeObj *obj);
 void gfx_video_deinit(void);
 
 u16 gfx_video_get_width(void);
