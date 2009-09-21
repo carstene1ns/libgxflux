@@ -328,7 +328,7 @@ void gfx_init(void) {
 	memset(&_gfx.view, 0, sizeof(Mtx));
 	guLookAt(_gfx.view, &_camera.pos, &_camera.up, &_camera.view);
 
-	guOrtho(p, 0, _gfx.vm.efbHeight, 0, _gfx.vm.fbWidth, 100, 1000);
+	guOrtho(p, 0, _gfx.vm.efbHeight - 1, 0, _gfx.vm.fbWidth - 1, 100, 1000);
 	GX_LoadProjectionMtx (p, GX_ORTHOGRAPHIC);
 	_update_viewport();
 
