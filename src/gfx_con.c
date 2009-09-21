@@ -449,7 +449,26 @@ static ssize_t _con_read(struct _reent *r, int fd, char *ptr, size_t len) {
 }
 
 bool gfx_con_init(gfx_screen_coords_t *coords) {
+	static bool inited = false;
 	u32 level;
+
+	if (!inited) {
+		memset(&_con, 0, sizeof(_con));
+
+		if (!gfx_tex_init(&_con.tex, GFX_TF_I4, 0, TEX_WIDTH, TEX_HEIGHT)) 
+			return false;
+
+		// TODO new function to init a tex from an existing buffer
+		memcpy(_con.tex.pixels, gfx_con_font, gfx_con_font_len);
+		gfx_tex_flush_texture(&_con.tex);
+
+		if (!gfx_tiles_init(&_con.tiles, &_con.tex, TEX_TILES_X, TEX_TILES_Y)) {
+			gfx_tex_deinit(&_con.tex);
+			return false;
+		}
+
+		inited = true;
+	}
 
 	_CPU_ISR_Disable(level);
 	devoptab_list[STD_IN] = &_dt_stdio;
@@ -465,19 +484,7 @@ bool gfx_con_init(gfx_screen_coords_t *coords) {
 	clearerr(stdout);
 	clearerr(stderr);
 
-	memset(&_con, 0, sizeof(_con));
-
 	_con.usbgecko = usb_isgeckoalive(USBGECKO_CHANNEL);
-
-	if (!gfx_tex_init(&_con.tex, GFX_TF_I4, 0, TEX_WIDTH, TEX_HEIGHT)) 
-		return false;
-
-	// TODO new function to init a tex from an existing buffer
-	memcpy(_con.tex.pixels, gfx_con_font, gfx_con_font_len);
-	gfx_tex_flush_texture(&_con.tex);
-
-	if (!gfx_tiles_init(&_con.tiles, &_con.tex, TEX_TILES_X, TEX_TILES_Y))
-		return false;
 
 	if (coords) {
 		_con.x = coords->x;
@@ -491,6 +498,7 @@ bool gfx_con_init(gfx_screen_coords_t *coords) {
 		_con.rows = (gfx_video_get_height() - 96) / TEX_CHAR_HEIGHT;
 	}
 
+	free(_con.buf);
 	_con.buf = (u16 *) malloc(_con.cols * _con.rows * sizeof(u16));
 	if (!_con.buf)
 		return false;
@@ -515,10 +523,9 @@ void gfx_con_deinit(void) {
 	_CPU_ISR_Restore(level);
 
 	free(_con.buf);
-	memset(&_con, 0, sizeof(_con));
-
 	gfx_tiles_deinit(&_con.tiles);
 	gfx_tex_deinit(&_con.tex);
+	memset(&_con, 0, sizeof(_con));
 }
 
 u8 gfx_con_get_columns(void) {
