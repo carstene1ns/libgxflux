@@ -35,6 +35,7 @@ typedef struct {
 
 static struct {
 	GXRModeObj vm;
+	u8 overscan;
 	bool doublestrike;
 
 	u32 *fb[2];
@@ -191,6 +192,13 @@ void gfx_video_get_modeobj(GXRModeObj *obj, gfx_video_standard_t standard,
 	memcpy(obj, mode_table[standard][mode], sizeof(GXRModeObj));
 }
 
+void gfx_video_set_overscan(u8 overscan) {
+	if (overscan > 80)
+		overscan = 80;
+
+	_gfx.overscan = overscan;
+}
+
 void gfx_video_init(GXRModeObj *obj) {
 	static bool inited = false;
 	u32 fb_size;
@@ -199,17 +207,18 @@ void gfx_video_init(GXRModeObj *obj) {
 	if (!inited) {
 		memset(&_gfx, 0, sizeof(_gfx));
 
+		_gfx.overscan = 32;
 		_gfx.viewport_enabled = true;
 		_gfx.ar = 4.0 / 3.0;
 	}
 
-	if (obj) {
+	if (obj)
 		memcpy(&_gfx.vm, obj, sizeof(GXRModeObj));
-	} else {
+	else
 		gfx_video_get_modeobj(&_gfx.vm, GFX_STANDARD_AUTO, GFX_MODE_DEFAULT);
-		_gfx.vm.viWidth = 672;
-		_gfx.vm.viXOrigin = (VI_MAX_WIDTH_NTSC - _gfx.vm.viWidth) / 2;
-	}
+
+	_gfx.vm.viWidth = 640 + _gfx.overscan;
+	_gfx.vm.viXOrigin = (VI_MAX_WIDTH_NTSC - _gfx.vm.viWidth) / 2;
 
 	_gfx.doublestrike = _gfx.vm.viHeight == 2 * _gfx.vm.xfbHeight;
 
