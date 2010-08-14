@@ -7,19 +7,17 @@ HEADERS = gfx.h gfx_types.h gfx_tex.h gfx_color.h gfx_con.h gfx_con_esc.h
 include ../common.mk
 
 ifeq ($(GAMECUBE),1)
-INSTALLBASE = $(DEVKITPRO)/cube
+INSTALLLIB = $(DEVKITPRO)/libogc/lib/cube
 else
-INSTALLBASE = $(DEVKITPRO)/wii
+INSTALLLIB = $(DEVKITPRO)/libogc/lib/wii
 endif
 
-INSTALLLIB = $(INSTALLBASE)/lib
-INSTALLINCLUDE = $(INSTALLBASE)/include/gfx
+INSTALLINCLUDE = $(DEVKITPRO)/libogc/include/gxflux
 
 install: all
-	@echo "  INSTALL   $(INSTALLBASE)"
-	@mkdir -p $(INSTALLLIB)
-	@mkdir -p $(INSTALLINCLUDE)
+	@echo "  INSTALL   $(INSTALLLIB)"
 	@install -m 644 $(TARGET) $(INSTALLLIB)
+	@mkdir -p $(INSTALLINCLUDE)
 	@install -m 644 $(HEADERS) $(INSTALLINCLUDE)
 
 install-all:

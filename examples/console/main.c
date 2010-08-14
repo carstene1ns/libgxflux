@@ -6,8 +6,8 @@
 #include <ogcsys.h>
 #include <ogc/lwp_watchdog.h>
 
-#include <gfx/gfx.h>
-#include <gfx/gfx_con.h>
+#include <gxflux/gfx.h>
+#include <gxflux/gfx_con.h>
 
 #define IRAND(max) ((int) ((float )(max) * (rand() / (RAND_MAX + 1.0))))
 
