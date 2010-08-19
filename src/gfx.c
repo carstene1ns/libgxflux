@@ -56,16 +56,6 @@ static struct {
 	_colorop_t colorop;
 } _gfx;
 
-static struct {
-	guVector pos;
-	guVector up;
-	guVector view;
-} _camera = {
-	{ 0.0, 0.0, 0.0 },
-	{ 0.0, 0.5, 0.0 },
-	{ 0.0, 0.0, -0.5 }
-};
-
 // Standard, DS
 static GXRModeObj *mode_table[5][2] = {
 	{ &TVNtsc480Prog, &TVNtsc240Ds },
@@ -335,9 +325,9 @@ void gfx_init(void) {
 	GX_InvalidateTexAll();
 
 	memset(&_gfx.view, 0, sizeof(Mtx));
-	guLookAt(_gfx.view, &_camera.pos, &_camera.up, &_camera.view);
+	guMtxIdentity(_gfx.view);
 
-	guOrtho(p, 0, _gfx.vm.efbHeight - 1, 0, _gfx.vm.fbWidth - 1, 100, 1000);
+	guOrtho(p, 0, _gfx.vm.efbHeight, 0, _gfx.vm.fbWidth, 100, 1000);
 	GX_LoadProjectionMtx (p, GX_ORTHOGRAPHIC);
 	_update_viewport();
 
