@@ -70,6 +70,8 @@ static const devoptab_t _dt_stdio = {
 	NULL,				// device ftrunctate_r
 	NULL,				// device fsync_r
 	NULL,				// deviceData;
+	NULL,				// device chmod_r
+	NULL				// device fchmod_r
 };
 
 static const GXColor _con_colors[] = {

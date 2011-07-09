@@ -1,4 +1,4 @@
-PREFIX ?= $(DEVKITPPC)/bin/powerpc-gekko-
+PREFIX ?= $(DEVKITPPC)/bin/powerpc-eabi-
 
 AR = $(PREFIX)ar
 AS = $(PREFIX)as
