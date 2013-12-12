@@ -8,9 +8,6 @@
  *
  */
 
-#include <ogc/machine/processor.h>
-#include <ogc/usbgecko.h>
-
 #include "gfx.h"
 #include "gfx_con.h"
 
@@ -20,6 +17,8 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <ogc/machine/processor.h>
+#include <ogc/usbgecko.h>
 #include <sys/iosupport.h>
 
 #define USBGECKO_CHANNEL 1

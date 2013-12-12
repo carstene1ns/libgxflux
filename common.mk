@@ -9,9 +9,9 @@ RANLIB = $(PREFIX)ranlib
 STRIP = $(PREFIX)strip
 
 MACHDEP += -g -DGEKKO -mcpu=750 -meabi -mhard-float
-CFLAGS += $(MACHDEP) -Os -Wall -Wextra -pipe -I$(DEVKITPRO)/libogc/include
+CFLAGS += $(MACHDEP) -O2 -Wall -Wextra -pipe -I$(DEVKITPRO)/libogc/include
 LDFLAGS += $(MACHDEP)
-ASFLAGS += -D_LANGUAGE_ASSEMBLY -DHW_RVL -I$(DEVKITPRO)/libogc/include
+ASFLAGS += -D_LANGUAGE_ASSEMBLY -I$(DEVKITPRO)/libogc/include
 
 ifeq ($(GAMECUBE),1)
 MACHDEP += -mogc
@@ -19,7 +19,7 @@ CFLAGS += -DHW_DOL
 LDFLAGS += -L$(DEVKITPRO)/libogc/lib/cube
 ASFLAGS += -DHW_DOL
 else
-MACHDEP += -mrvl 
+MACHDEP += -mrvl
 CFLAGS += -DHW_RVL
 LDFLAGS += -L$(DEVKITPRO)/libogc/lib/wii
 ASFLAGS += -DHW_RVL
@@ -91,4 +91,3 @@ clean:
 -include $(DEPDIR)/*
 
 .PHONY: clean
-

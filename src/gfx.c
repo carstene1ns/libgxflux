@@ -60,7 +60,7 @@ static struct {
 static GXRModeObj *mode_table[5][2] = {
 	{ &TVNtsc480Prog, &TVNtsc240Ds },
 	{ &TVNtsc480IntDf, &TVNtsc240Ds },
-	{ &TVPal574IntDfScale, &TVPal264Ds },
+	{ &TVPal576IntDfScale, &TVPal264Ds },
 	{ &TVEurgb60Hz480IntDf, &TVEurgb60Hz240Ds },
 	{ &TVMpal480IntDf, &TVMpal240Ds }
 };
