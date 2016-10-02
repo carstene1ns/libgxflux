@@ -1,5 +1,5 @@
-#ifndef __GFX_CON_ESC_H__
-#define __GFX_CON_ESC_H__
+#ifndef GFX_CON_ESC_H
+#define GFX_CON_ESC_H
 
 #define CON_RESET				"\ec"
 
@@ -67,4 +67,3 @@
 #define S_IWHITE(s)				C_IWHITE s CON_COLRESET
 
 #endif
-

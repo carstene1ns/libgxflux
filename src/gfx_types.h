@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef __GFX_TYPES_H__
-#define __GFX_TYPES_H__
+#ifndef GFX_TYPES_H
+#define GFX_TYPES_H
 
 #include <gccore.h>
 
@@ -88,4 +88,3 @@ typedef enum {
 #endif
 
 #endif
-

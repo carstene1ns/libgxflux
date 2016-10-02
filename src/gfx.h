@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef __GFX_H__
-#define __GFX_H__
+#ifndef GFX_H
+#define GFX_H
 
 #include "gfx_types.h"
 #include "gfx_color.h"
@@ -56,4 +56,3 @@ void gfx_draw_tile_by_index(gfx_tiles_t *tiles, gfx_screen_coords_t *coords,
 #endif
 
 #endif
-

@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef __GFX_COLOR_H__
-#define __GFX_COLOR_H__
+#ifndef GFX_COLOR_H
+#define GFX_COLOR_H
 
 #include "gfx_types.h"
 
@@ -37,4 +37,3 @@ static inline u32 gfx_color_u32(const GXColor c) {
 #endif
 
 #endif
-

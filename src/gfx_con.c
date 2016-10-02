@@ -37,10 +37,6 @@
 extern unsigned int gfx_con_font_len;
 extern unsigned char gfx_con_font[];
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 static ssize_t _con_write(struct _reent *r, int fd, const char *ptr,
 							size_t len);
 static ssize_t _con_read(struct _reent *r, int fd, char *ptr, size_t len);
@@ -598,8 +594,3 @@ void gfx_con_draw(void) {
 	gfx_set_colorop(COLOROP_NONE, gfx_color_none, gfx_color_none);
 	gfx_enable_viewport(vp);
 }
-
-#ifdef __cplusplus
-}
-#endif
-

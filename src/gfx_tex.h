@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef __GFX_TEX_H__
-#define __GFX_TEX_H__
+#ifndef GFX_TEX_H
+#define GFX_TEX_H
 
 #include "gfx_types.h"
 
@@ -38,4 +38,3 @@ void gfx_tiles_deinit(gfx_tiles_t *tiles);
 #endif
 
 #endif
-

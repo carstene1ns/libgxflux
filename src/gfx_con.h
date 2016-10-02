@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef __GFX_CON_H__
-#define __GFX_CON_H__
+#ifndef GFX_CON_H
+#define GFX_CON_H
 
 #include <stdio.h>
 
@@ -97,4 +97,3 @@ static inline void gfx_con_reset_colors(void) {
 #endif
 
 #endif
-

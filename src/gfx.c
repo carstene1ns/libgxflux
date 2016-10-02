@@ -14,10 +14,6 @@
 
 #include "gfx.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define FIFO_SIZE (512 * 1024)
 #define ORIGIN_Z (-500.0)
 
@@ -569,8 +565,3 @@ void gfx_draw_tile_by_index(gfx_tiles_t *tiles, gfx_screen_coords_t *coords,
 	_quad(coords->x, coords->y, coords->w, coords->h, tile->s1, tile->t1,
 			tile->s2, tile->t2);
 }
-
-#ifdef __cplusplus
-}
-#endif
-

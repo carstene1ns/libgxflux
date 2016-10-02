@@ -14,10 +14,6 @@
 
 #include "gfx.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void gfx_coords(gfx_screen_coords_t *coords, gfx_tex_t *tex, gfx_coord_t type) {
 	f32 ar_efb, ar_tex;
 	u16 sw, sh;
@@ -368,8 +364,3 @@ void gfx_tiles_deinit(gfx_tiles_t *tiles) {
 	free(tiles->tiles);
 	memset(tiles, 0, sizeof(gfx_tiles_t));
 }
-
-#ifdef __cplusplus
-}
-#endif
-

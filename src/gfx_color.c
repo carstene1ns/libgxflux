@@ -10,10 +10,6 @@
 
 #include "gfx_color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // TODO add some more
 const GXColor gfx_color_none	=	{	0,		0,		0,		0		};
 const GXColor gfx_color_black	=	{	0,		0,		0,		0xff	};
@@ -21,8 +17,3 @@ const GXColor gfx_color_red		=	{	0xff,	0,		0,		0xff	};
 const GXColor gfx_color_green	=	{	0,		0xff,	0,		0xff	};
 const GXColor gfx_color_blue	=	{	0,		0,		0xff,	0xff	};
 const GXColor gfx_color_white	=	{	0xff,	0xff,	0xff,	0xff	};
-
-#ifdef __cplusplus
-}
-#endif
-
