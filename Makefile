@@ -1,7 +1,7 @@
-all: examples
-
 lib:
 	@$(MAKE) -C src
+
+all: examples
 
 install:
 	@$(MAKE) -C src install-all
@@ -14,4 +14,3 @@ clean:
 	@$(MAKE) -C examples clean
 
 .PHONY: lib examples install clean
-

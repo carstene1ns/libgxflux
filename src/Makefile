@@ -6,19 +6,14 @@ HEADERS = gfx.h gfx_types.h gfx_tex.h gfx_color.h gfx_con.h gfx_con_esc.h
 
 include ../common.mk
 
-ifeq ($(GAMECUBE),1)
-INSTALLLIB = $(DEVKITPRO)/libogc/lib/cube
-else
-INSTALLLIB = $(DEVKITPRO)/libogc/lib/wii
-endif
-
-INSTALLINCLUDE = $(DEVKITPRO)/libogc/include/gxflux
+INSTALLHEADERS = $(INSTALLINCLUDE)/gxflux
 
 install: all
-	@echo "  INSTALL   $(INSTALLLIB)"
+	@echo "  INSTALL   $(INSTALLLIB)/$(TARGET)"
 	@install -m 644 $(TARGET) $(INSTALLLIB)
-	@mkdir -p $(INSTALLINCLUDE)
-	@install -m 644 $(HEADERS) $(INSTALLINCLUDE)
+	@mkdir -p $(INSTALLHEADERS)
+	@echo "  INSTALL   $(INSTALLHEADERS)/*.h"
+	@install -m 644 $(HEADERS) $(INSTALLHEADERS)
 
 install-all:
 	@$(MAKE) --no-print-directory clean
@@ -27,6 +22,4 @@ install-all:
 	@$(MAKE) --no-print-directory GAMECUBE=1 install
 	@$(MAKE) --no-print-directory GAMECUBE=1 clean
 
-
 .PHONY: install
-

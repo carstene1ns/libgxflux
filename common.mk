@@ -1,11 +1,11 @@
 PREFIX ?= $(DEVKITPPC)/bin/powerpc-eabi-
 
-AR = $(PREFIX)ar
+AR = $(PREFIX)gcc-ar
 AS = $(PREFIX)as
 CC = $(PREFIX)gcc
 CXX = $(PREFIX)g++
 OBJCOPY = $(PREFIX)objcopy
-RANLIB = $(PREFIX)ranlib
+RANLIB = $(PREFIX)gcc-ranlib
 STRIP = $(PREFIX)strip
 
 MACHDEP += -g -DGEKKO -mcpu=750 -meabi -mhard-float
@@ -18,11 +18,15 @@ MACHDEP += -mogc
 CFLAGS += -DHW_DOL
 LDFLAGS += -L$(DEVKITPRO)/libogc/lib/cube
 ASFLAGS += -DHW_DOL
+INSTALLINCLUDE = $(DEVKITPRO)/portlibs/gamecube/include
+INSTALLLIB = $(DEVKITPRO)/portlibs/gamecube/lib
 else
 MACHDEP += -mrvl
 CFLAGS += -DHW_RVL
 LDFLAGS += -L$(DEVKITPRO)/libogc/lib/wii
 ASFLAGS += -DHW_RVL
+INSTALLINCLUDE = $(DEVKITPRO)/portlibs/wii/include
+INSTALLLIB = $(DEVKITPRO)/portlibs/wii/lib
 endif
 
 ifneq ($(LDSCRIPT),)
@@ -62,11 +66,11 @@ $(TARGET_STRIPPED): $(TARGET)
 
 wiiload: $(TARGET_STRIPPED)
 	@echo "  WIILOAD   $<"
-	@$(DEVKITPPC)/bin/wiiload $<
+	@$(DEVKITPRO)/tools/bin/wiiload $<
 
 geckoload: $(TARGET_STRIPPED)
 	@echo "  WIILOAD   $<"
-	@WIILOAD=$(USBGECKODEVICE) $(DEVKITPPC)/bin/wiiload $<
+	@WIILOAD=$(USBGECKODEVICE) $(DEVKITPRO)/tools/bin/wiiload $<
 
 upload: geckoload
 endif
@@ -78,11 +82,11 @@ endif
 
 %.o: %.s
 	@echo "  ASSEMBLE  $@"
-	@$(CC) $(CFLAGS) $(DEFINES) $(ASFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) $(DEFINES) $(ASFLAGS) -x assembler-with-cpp -c $< -o $@
 
 %.o: %.S
 	@echo "  ASSEMBLE  $@"
-	@$(CC) $(CFLAGS) $(DEFINES) $(ASFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) $(DEFINES) $(ASFLAGS) -x assembler-with-cpp -c $< -o $@
 
 clean:
 	@rm -rf $(DEPDIR)
