@@ -304,14 +304,9 @@ static size_t _con_esc(const char *ptr, size_t len) {
 			break;
 
 		case 'J':
-			switch (parms[0]) {
-			case 2: // Erase Screen
+			if (parms[0] == 2) // Erase Screen
 				_con_clear();
-				break;
-
-			default:
-				break;
-			}
+			break;
 
 		case 'm': // Set Attribute Mode
 			if (!count)
