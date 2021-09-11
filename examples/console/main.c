@@ -13,7 +13,14 @@
 
 static bool quit = false;
 
-void stmcb(void) {
+void pwrcb() {
+	quit = true;
+}
+
+void rswcb(u32 irq, void* ctx) {
+	(void) irq;
+	(void) ctx;
+
 	quit = true;
 }
 
@@ -25,8 +32,8 @@ int main(int argc, char *argv[]) {
 	VIDEO_Init();
 	PAD_Init();
 
-	SYS_SetResetCallback(stmcb);
-	SYS_SetPowerCallback(stmcb);
+	SYS_SetResetCallback(rswcb);
+	SYS_SetPowerCallback(pwrcb);
 
 	gfx_video_init(NULL);
 	gfx_init();
@@ -58,6 +65,11 @@ int main(int argc, char *argv[]) {
 
 	while (!quit) {
 		b = 0;
+
+		// other way without callback
+		//if (SYS_ResetButtonDown())
+		//	quit = true;
+
 		if (PAD_ScanPads() & 1) {
 			b = PAD_ButtonsDown(0);
 		
