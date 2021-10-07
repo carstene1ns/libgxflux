@@ -33,6 +33,12 @@ bool gfx_tex_convert(gfx_tex_t *tex, const void *src);
 bool gfx_tiles_init(gfx_tiles_t *tiles, gfx_tex_t *tex, u8 cols, u8 rows);
 void gfx_tiles_deinit(gfx_tiles_t *tiles);
 
+bool gfx_spritesheet_init(gfx_spritesheet_t *sheet, gfx_tex_t *tex, u16 count);
+void gfx_spritesheet_deinit(gfx_spritesheet_t *sheet);
+
+void gfx_spritesheet_set_coords(gfx_spritesheet_t *sheet, u16 num, u16 x, u16 y,
+								u16 w, u16 h);
+
 #ifdef __cplusplus
 }
 #endif

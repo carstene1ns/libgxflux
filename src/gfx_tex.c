@@ -364,3 +364,55 @@ void gfx_tiles_deinit(gfx_tiles_t *tiles) {
 	free(tiles->tiles);
 	memset(tiles, 0, sizeof(gfx_tiles_t));
 }
+
+bool gfx_spritesheet_init(gfx_spritesheet_t *sheet, gfx_tex_t *tex, u16 count) {
+	if (!sheet || !tex)
+		return false;
+
+	memset(sheet, 0, sizeof(gfx_spritesheet_t));
+	sheet->sprites = (gfx_coords_t *) calloc(count, sizeof(gfx_coords_t));
+	if (!sheet->sprites)
+		return false;
+
+	sheet->texparts = (gfx_tex_coord_t *) calloc(count, sizeof(gfx_tex_coord_t));
+	if (!sheet->texparts)
+		return false;
+
+	sheet->tex = tex;
+	sheet->count = count;
+
+	return true;
+}
+
+void gfx_spritesheet_deinit(gfx_spritesheet_t *sheet) {
+	if (!sheet)
+		return;
+
+	free(sheet->sprites);
+	free(sheet->texparts);
+	memset(sheet, 0, sizeof(gfx_spritesheet_t));
+}
+
+void gfx_spritesheet_set_coords(gfx_spritesheet_t *sheet, u16 num, u16 x, u16 y,
+								u16 w, u16 h) {
+	gfx_tex_coord_t *texpart;
+	gfx_coords_t *sprite;
+
+	if (!sheet)
+		return;
+
+	if (num > sheet->count)
+		return;
+
+	sprite = &sheet->sprites[num];
+	sprite->x = x;
+	sprite->y = y;
+	sprite->w = w;
+	sprite->h = h;
+
+	texpart = &sheet->texparts[num];
+	texpart->s1 = (f32)x / sheet->tex->width + 0.001f / sheet->tex->width;
+	texpart->t1 = (f32)y / sheet->tex->height + 0.001f / sheet->tex->height;
+	texpart->s2 = (f32)(x + w) / sheet->tex->width - 0.001f / sheet->tex->width;
+	texpart->t2 = (f32)(y + h) / sheet->tex->height - 0.001f / sheet->tex->height;
+}

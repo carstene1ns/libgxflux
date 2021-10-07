@@ -61,7 +61,9 @@ typedef enum {
 typedef struct {
 	f32 x, y;
 	f32 w, h;
-} gfx_screen_coords_t;
+} gfx_coords_t;
+// alias
+typedef gfx_coords_t gfx_screen_coords_t;
 
 typedef struct {
 	f32 s1, t1;
@@ -76,6 +78,13 @@ typedef struct {
 	u16 height;
 	gfx_tex_coord_t *tiles;
 } gfx_tiles_t;
+
+typedef struct {
+	gfx_tex_t *tex;
+	u16 count;
+	gfx_coords_t *sprites;
+	gfx_tex_coord_t *texparts;
+} gfx_spritesheet_t;
 
 typedef enum {
 	COLOROP_NONE = 0,

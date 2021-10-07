@@ -533,7 +533,18 @@ static void _quad(f32 x, f32 y, f32 w, f32 h, f32 s1, f32 t1, f32 s2, f32 t2) {
 }
 
 void gfx_draw_tex(gfx_tex_t *tex, gfx_screen_coords_t *coords) {
-	if (!tex || !coords)
+	gfx_tex_coord_t part;
+	part.s1 = 0.0;
+	part.t1 = 0.0;
+	part.s2 = 1.0;
+	part.t2 = 1.0;
+
+	gfx_draw_tex_part(tex, coords, &part);
+}
+
+void gfx_draw_tex_part(gfx_tex_t *tex, gfx_screen_coords_t *coords,
+						gfx_tex_coord_t *part) {
+	if (!tex || !coords || !part)
 		return;
 
 	if (_gfx.tex_loaded != &tex->obj) {
@@ -541,7 +552,8 @@ void gfx_draw_tex(gfx_tex_t *tex, gfx_screen_coords_t *coords) {
 		_gfx.tex_loaded = &tex->obj;
 	}
 
-	_quad(coords->x, coords->y, coords->w, coords->h, 0.0, 0.0, 1.0, 1.0);
+	_quad(coords->x, coords->y, coords->w, coords->h, part->s1, part->t1,
+			part->s2, part->t2);
 }
 
 void gfx_draw_tile(gfx_tiles_t *tiles, gfx_screen_coords_t *coords,
@@ -551,17 +563,17 @@ void gfx_draw_tile(gfx_tiles_t *tiles, gfx_screen_coords_t *coords,
 
 void gfx_draw_tile_by_index(gfx_tiles_t *tiles, gfx_screen_coords_t *coords,
 							u16 index) {
-	gfx_tex_coord_t *tile;
-
 	if (!tiles)
 		return;
 
-	if (_gfx.tex_loaded != &tiles->tex->obj) {
-		GX_LoadTexObj(&tiles->tex->obj, GX_TEXMAP0);
-		_gfx.tex_loaded = &tiles->tex->obj;
-	}
+	gfx_draw_tex_part(tiles->tex, coords, &tiles->tiles[index]);
+}
 
-	tile = &tiles->tiles[index];
-	_quad(coords->x, coords->y, coords->w, coords->h, tile->s1, tile->t1,
-			tile->s2, tile->t2);
+
+void gfx_draw_sprite_by_index(gfx_spritesheet_t *sheet,
+								gfx_screen_coords_t *coords, u16 index) {
+	if (!sheet)
+		return;
+
+	gfx_draw_tex_part(sheet->tex, coords, &sheet->texparts[index]);
 }

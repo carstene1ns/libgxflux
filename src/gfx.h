@@ -46,10 +46,16 @@ void gfx_frame_abort(void);
 void gfx_set_colorop(gfx_colorop_t op, const GXColor c1, const GXColor c2);
 
 void gfx_draw_tex(gfx_tex_t *tex, gfx_screen_coords_t *coords);
+void gfx_draw_tex_part(gfx_tex_t *tex, gfx_screen_coords_t *coords,
+						gfx_tex_coord_t *part);
+
 void gfx_draw_tile(gfx_tiles_t *tiles, gfx_screen_coords_t *coords,
 					u8 col, u8 row);
 void gfx_draw_tile_by_index(gfx_tiles_t *tiles, gfx_screen_coords_t *coords,
 							u16 index);
+
+void gfx_draw_sprite_by_index(gfx_spritesheet_t *sheet,
+								gfx_screen_coords_t *coords, u16 index);
 
 #ifdef __cplusplus
 }
