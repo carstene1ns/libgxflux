@@ -11,6 +11,9 @@
 #include <malloc.h>
 #include <string.h>
 #include <math.h>
+#ifdef HW_RVL
+#include <ogc/machine/processor.h>
+#endif
 
 #include "gfx.h"
 
@@ -196,6 +199,17 @@ void gfx_video_init(GXRModeObj *obj) {
 		_gfx.overscan = 32;
 		_gfx.viewport_enabled = true;
 		_gfx.ar = 4.0 / 3.0;
+#ifdef HW_RVL
+		// Set pillarboxing on Wii U
+		if ((*(u32*)(0xCD8005A0) >> 16) == 0xCAFE) {
+			if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
+				write32(0xd8006a0, 0x30000004);
+			} else {
+				write32(0xd8006a0, 0x10000002);
+			}
+			mask32(0xd8006a8, 0, 2);
+		}
+#endif
 	}
 
 	if (obj)
